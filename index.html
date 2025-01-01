@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Thêm chữ "Update Love" ở đầu trang */
+        .header {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Màn hình yêu cầu nhập mật khẩu */
+        .password-modal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Màu nền tối */
+            z-index: 1000;
+        }
+
+        .password-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .password-modal input {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .password-modal button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .password-modal button:hover {
+            background-color: #218838;
+        }
+
+        /* Các phần còn lại của style.css không thay đổi */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            background-color: #f0f0f0;
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .image-container {
+            width: 100px;
+            /* Kích thước ảnh */
+            height: 100px;
+            /* Kích thước ảnh */
+        }
+
+        .image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            /* Ẩn modal khi chưa được mở */
+            position: fixed;
+            z-index: 1000;
+            /* Đảm bảo modal hiển thị trên cùng */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            /* Màu nền tối */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            position: relative;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-image {
+            max-width: 90vw;
+            max-height: 80vh;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background-color: #ddd;
+        }
+
+        /* Thông báo login thành công */
+        .login-success-message {
+            display: none;
+            /* Ẩn thông báo mặc định */
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1001;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Thêm chữ "Update Love" ở đầu trang -->
+    <div class="header">
+        <h1>Update Love</h1>
+    </div>
+    <div id="login-success-message" class="login-success-message">
+        Vui lòng chờ một lúc để ảnh được tải lên. Nhấn vào ảnh để tải ảnh về máy !
+    </div>
+
+    <!-- Màn hình yêu cầu nhập mật khẩu -->
+    <div id="password-modal" class="password-modal">
+        <div class="password-modal-content">
+            <h2>Xin chào ! </h2>
+            <h3>Vui lòng nhập mật khẩu để có thể truy cập</h3>
+            <p>- Sent by Trần Văn Quyền-</p>
+            <input type="password" id="password-input" placeholder="Mật khẩu của bạn là:">
+            <button id="submit-password">Truy cập</button>
+            <p id="error-message" style="color: red; display: none;">Mật khẩu sai, vui lòng nhập lại !</p>
+        </div>
+    </div>
+
+    <div class="gallery" id="gallery"></div>
+
+    <!-- Modal để hiển thị ảnh lớn và nút tải xuống -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <img id="modal-image" class="modal-image" />
+            <a id="download-button" href="#" download>
+                <button class="download-btn">Download</button>
+            </a>
+            <button id="back-button" class="back-btn">Back</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
